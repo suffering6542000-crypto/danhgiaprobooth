@@ -25,7 +25,25 @@ async function sha256(text) {
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
+async function safeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
 
+  const encoder = new TextEncoder();
+  const [aHash, bHash] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(a)),
+    crypto.subtle.digest("SHA-256", encoder.encode(b))
+  ]);
+
+  const aBytes = new Uint8Array(aHash);
+  const bBytes = new Uint8Array(bHash);
+
+  let diff = 0;
+  for (let i = 0; i < aBytes.length; i++) {
+    diff |= aBytes[i] ^ bBytes[i];
+  }
+
+  return diff === 0;
+}
 async function hashClient(request, env) {
   if (!env.RATE_LIMIT_SALT) throw new Error("RATE_LIMIT_SALT is not configured");
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
@@ -125,7 +143,7 @@ async function validAdminCookie(request, env) {
   const [expires, sig] = token.split(".");
   if (!expires || !sig || !/^\d+$/.test(expires) || Number(expires) < Date.now()) return false;
   const expected = await signAdminToken(env, Number(expires));
-  return token === expected;
+  return await safeEqual(token, expected);
 }
 
 async function readJsonBody(request) {
@@ -206,7 +224,10 @@ export async function onRequest(context) {
           "Cache-Control": "no-store"
         });
       }
-      const ok = !!env.ADMIN_KEY && typeof body?.key === "string" && body.key.length > 0 && body.key === env.ADMIN_KEY;
+      const ok = !!env.ADMIN_KEY &&
+        typeof body?.key === "string" &&
+        body.key.length > 0 &&
+        await safeEqual(body.key, env.ADMIN_KEY);
       await env.DB.prepare("INSERT INTO admin_attempts (ip_hash, success) VALUES (?, ?)").bind(ipHash, ok ? 1 : 0).run();
       if (!ok) return json({ error: "Mã quản trị không đúng." }, 401, { "Cache-Control": "no-store" });
 
