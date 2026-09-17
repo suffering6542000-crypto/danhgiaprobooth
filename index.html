@@ -60,11 +60,28 @@ async function loadConfig(){
     const j=await r.json();
     if(j.turnstileSiteKey){
       window.TURNSTILE_SITE_KEY=j.turnstileSiteKey;
-      const script=document.createElement('script');
-      script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-      script.async=true; script.defer=true;
-      script.onload=()=>{ if(window.turnstile) window.turnstileWidgetId=turnstile.render('#turnstile',{sitekey:window.TURNSTILE_SITE_KEY}); };
-      document.head.appendChild(script);
+      const renderTurnstile=()=>{
+  if(window.turnstile &&
+     typeof window.turnstile.render==='function' &&
+     window.turnstileWidgetId===undefined){
+    window.turnstileWidgetId=window.turnstile.render(
+      '#turnstile',
+      {sitekey:window.TURNSTILE_SITE_KEY}
+    );
+  }
+};
+
+if(window.turnstile && typeof window.turnstile.render==='function'){
+  renderTurnstile();
+}else if(!document.querySelector('script[data-probooth-turnstile]')){
+  const script=document.createElement('script');
+  script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  script.async=true;
+  script.defer=true;
+  script.dataset.proboothTurnstile='1';
+  script.onload=renderTurnstile;
+  document.head.appendChild(script);
+}
     }
   }catch(e){console.warn('Config unavailable',e)}
 }
