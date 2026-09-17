@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phiếu đánh giá trải nghiệm</title>
+<style>
+:root{--ink:#111;--muted:#555;--star:#f4b400}
+*{box-sizing:border-box}body{margin:0;background:#ececec;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.page{max-width:920px;margin:auto;background:#fff;min-height:100vh;padding:24px 22px 34px}
+.header{text-align:center;border-bottom:2px solid #111;padding:4px 0 16px;margin-bottom:12px}.heart{font-size:28px}h1{font-size:38px;line-height:1.03;margin:0;font-weight:900}.subtitle{font-size:15px;font-style:italic;margin-top:10px}.decor{margin-top:10px}
+.grid{display:flex;flex-direction:column;border:1.5px solid #111;border-radius:9px;overflow:hidden}.row{display:grid;grid-template-columns:250px 1fr;min-height:120px;border-bottom:1px dashed #aaa}.row:last-child{border:0}
+.info{display:flex;gap:12px;align-items:center;padding:13px 14px;border-right:1px solid #999}.icon{font-size:42px;width:52px;text-align:center}.num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;background:#111;color:#fff;border-radius:50%;font-size:14px;font-weight:800;margin-right:7px}.name{font-size:18px;font-weight:900}.desc{font-size:13px;color:#444;margin-top:5px}
+.rating{display:flex;align-items:center;justify-content:center;padding:10px 18px}.stars{display:flex;justify-content:center;gap:14px}.starbox{text-align:center;min-width:48px}.star{border:0;background:transparent;padding:0;font-size:43px;color:#aaa;cursor:pointer}.star.active{color:var(--star);transform:scale(1.08)}.n{text-align:center;font-weight:700;font-size:14px}.ends{display:flex;justify-content:space-between;font-size:10px;color:#444;margin-top:7px}
+.overall,.comment{border:1.5px solid #111;border-radius:9px;margin-top:8px}.overall{display:grid;grid-template-columns:250px 1fr;min-height:108px}.overall .info{border-right:1px solid #999}.comment{padding:13px 16px}.comment-title{font-weight:900;margin-bottom:9px}textarea{width:100%;min-height:105px;border:0;border-bottom:1px dashed #aaa;resize:vertical;font:inherit;outline:0}
+.actions{display:flex;gap:10px;margin-top:12px}.send{flex:1;border:0;border-radius:11px;background:#111;color:#fff;font-size:17px;font-weight:800;padding:15px;cursor:pointer}.reset{border:1px solid #111;border-radius:11px;background:#fff;padding:15px 18px;font-weight:700;cursor:pointer}.thanks{text-align:center;margin-top:16px;font-family:Georgia,serif;font-style:italic}
+.status{text-align:center;margin-top:10px;min-height:22px}.success{display:none;position:fixed;inset:0;background:#fff;z-index:20;align-items:center;justify-content:center;padding:25px}.success-card{text-align:center;max-width:420px}.check{font-size:65px}
+.admin{display:none;margin-top:18px;border:1px solid #ccc;border-radius:12px;padding:16px;background:#fafafa}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:#fff;border:1px solid #ddd;border-radius:10px;padding:10px;text-align:center}.stat b{font-size:22px;display:block}.pager{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0}.pager button{border:1px solid #111;background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer}.criteria-stats{margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.criteria-stat{background:#fff;border:1px solid #ddd;border-radius:10px;padding:9px;text-align:center;font-size:13px}.criteria-stat b{display:block;font-size:18px}.review{background:#fff;border:1px solid #ddd;border-radius:10px;padding:12px;margin-top:8px}.meta{font-size:12px;color:#666;margin-top:5px}
+@media(max-width:700px){body{background:#fff}.page{padding:15px 10px 28px}h1{font-size:28px}.row,.overall{grid-template-columns:1fr}.row{min-height:0}.info{border-right:0;border-bottom:1px dashed #aaa}.rating{padding:9px 7px 13px}.stars{gap:3px;width:100%;justify-content:space-around}.starbox{min-width:44px}.star{font-size:39px}.overall .info{border-right:0}.actions{flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.criteria-stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<main class="page">
+<header class="header"><div class="heart">♥</div><h1>PHIẾU ĐÁNH GIÁ<br>TRẢI NGHIỆM</h1><div class="subtitle">Ý kiến của bạn là động lực để chúng tôi hoàn thiện hơn mỗi ngày.</div><div class="decor">──────── ★ ────────</div></header>
+<section class="grid" id="criteria"></section>
+<section class="overall"><div class="info"><div class="icon">💗</div><div><div class="name">ĐÁNH GIÁ CHUNG</div><div class="desc">Trải nghiệm tổng thể của bạn</div></div></div><div class="rating" data-key="overall"><div class="stars"></div></div></section>
+<section class="comment"><div class="comment-title">✎ &nbsp;GÓP Ý THÊM</div><textarea id="comment" placeholder="Hãy chia sẻ điều bạn thích hoặc điều chúng tôi có thể làm tốt hơn..."></textarea></section>
+<div id="turnstile" style="display:flex;justify-content:center;margin-top:12px"></div><div class="actions"><button class="send" id="send">GỬI ĐÁNH GIÁ</button><button class="reset" id="reset">LÀM LẠI</button></div>
+<div class="status" id="status"></div><div class="thanks">♥ &nbsp; Cảm ơn bạn đã dành thời gian! &nbsp; ♥</div>
+<section class="admin" id="admin"><h2>Quản trị đánh giá</h2><div class="stats" id="stats"></div><div id="criteriaStats"></div><div class="pager" id="pager"></div><div id="reviews"></div><button class="reset" id="logout">ĐĂNG XUẤT</button></section>
+</main>
+<div class="success" id="success"><div class="success-card"><div class="check">✓</div><h2>Cảm ơn bạn!</h2><p>Đánh giá của bạn đã được ghi nhận.</p><button class="send" onclick="document.getElementById('success').style.display='none';resetForm()">ĐÁNH GIÁ TIẾP</button></div></div>
+<script>
+const data=[
+["📷","ẢNH GỐC","Chất lượng ảnh, màu sắc, độ nét, khoảnh khắc"],
+["🖼️","ẢNH IN","Chất lượng in, màu sắc, giấy, thành phẩm"],
+["🛋️","KHÔNG GIAN","Bố trí, thẩm mỹ, sự thoải mái, vệ sinh"],
+["💡","ĐÈN","Ánh sáng, hiệu ứng, độ phù hợp với nhu cầu"],
+["♙","DỊCH VỤ","Thái độ, tư vấn, hỗ trợ và trải nghiệm"],
+["🏷️","GIÁ CẢ","Mức giá so với chất lượng nhận được"]];
+const ratings={};
+function starsHTML(key){return '<div class="stars">'+[1,2,3,4,5].map(n=>`<div class="starbox"><button class="star" type="button" data-key="${key}" data-value="${n}" aria-label="${n} sao">☆</button><div class="n">${n}</div></div>`).join('')+'</div>'}
+document.getElementById('criteria').innerHTML=data.map((x,i)=>`<div class="row"><div class="info"><div class="icon">${x[0]}</div><div><div class="name"><span class="num">${i+1}</span>${x[1]}</div><div class="desc">${x[2]}</div></div></div><div class="rating" data-key="c${i}"><div>${starsHTML('c'+i)}<div class="ends"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div></div></div></div>`).join('');
+document.querySelector('[data-key="overall"] .stars').outerHTML=starsHTML('overall');
+document.addEventListener('click',e=>{const b=e.target.closest('.star');if(!b)return;const key=b.dataset.key,val=+b.dataset.value;ratings[key]=val;document.querySelectorAll(`.star[data-key="${key}"]`).forEach(s=>s.textContent=(+s.dataset.value<=val?'★':'☆'));});
+function resetForm(){Object.keys(ratings).forEach(k=>delete ratings[k]);document.querySelectorAll('.star').forEach(s=>s.textContent='☆');document.getElementById('comment').value='';document.getElementById('status').textContent='';}
+document.getElementById('reset').onclick=resetForm;
+document.getElementById('send').onclick=async()=>{
+const required=['c0','c1','c2','c3','c4','c5','overall'];
+if(required.some(k=>!ratings[k])){alert('Vui lòng đánh giá đủ các mục trước khi gửi.');return;}
+const status=document.getElementById('status');status.textContent='Đang gửi...';
+try{const r=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ratings,comment:document.getElementById('comment').value.trim(),turnstileToken:window.turnstileWidgetId!==undefined&&window.turnstile?turnstile.getResponse(window.turnstileWidgetId):''})});const j=await r.json();if(!r.ok)throw new Error(j.error||'Gửi thất bại');resetForm();if(window.turnstileWidgetId!==undefined&&window.turnstile)turnstile.reset(window.turnstileWidgetId);document.getElementById('success').style.display='flex';}catch(e){status.textContent='Không gửi được. Vui lòng thử lại.';console.error(e);}
+};
+let adminPage = 1;
+let adminLimit = 50;
+
+async function loadConfig(){
+  try{
+    const r=await fetch('/api/config',{cache:'no-store'});
+    const j=await r.json();
+    if(j.turnstileSiteKey){
+      window.TURNSTILE_SITE_KEY=j.turnstileSiteKey;
+      const script=document.createElement('script');
+      script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async=true; script.defer=true;
+      script.onload=()=>{ if(window.turnstile) window.turnstileWidgetId=turnstile.render('#turnstile',{sitekey:window.TURNSTILE_SITE_KEY}); };
+      document.head.appendChild(script);
+    }
+  }catch(e){console.warn('Config unavailable',e)}
+}
+
+async function loginAdmin(){
+  const key=prompt('Nhập mã quản trị:');
+  if(!key)return false;
+  const r=await fetch('/api/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({key})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){alert(j.error||'Đăng nhập thất bại.');return false;}
+  return true;
+}
+
+async function fetchAdmin(page=1){
+  const r=await fetch(`/api/reviews?admin=1&page=${page}&limit=${adminLimit}`,{credentials:'same-origin',cache:'no-store'});
+  const j=await r.json().catch(()=>({}));
+  if(r.status===401)return null;
+  if(!r.ok)throw new Error(j.error||'Không tải được dữ liệu.');
+  return j;
+}
+
+function renderAdmin(j){
+  document.getElementById('admin').style.display='block';
+  const s=j.stats||{}, p=j.pagination||{};
+  const avg=Number(s.avg_overall||0).toFixed(1);
+  document.getElementById('stats').innerHTML=`<div class="stat"><b>${p.total||0}</b><span>Tổng đánh giá</span></div><div class="stat"><b>${avg} ★</b><span>Điểm chung TB</span></div><div class="stat"><b>${s.low_count||0}</b><span>1–2 sao</span></div><div class="stat"><b>${s.high_count||0}</b><span>4–5 sao</span></div>`;
+  const labels={c0:'Ảnh gốc',c1:'Ảnh in',c2:'Không gian',c3:'Đèn',c4:'Dịch vụ',c5:'Giá cả'};
+  document.getElementById('criteriaStats').className='criteria-stats';
+  document.getElementById('criteriaStats').innerHTML=Object.entries(labels).map(([k,v])=>`<div class="criteria-stat"><b>${Number(s.criteria?.[k]||0).toFixed(1)} ★</b>${v}</div>`).join('');
+  const arr=j.reviews||[];
+  document.getElementById('reviews').innerHTML=arr.map(x=>`<div class="review"><b>★ ${Number(x.ratings?.overall||0)}/5</b><div>${Object.entries(x.ratings||{}).filter(([k])=>k!=='overall').map(([k,v])=>`Mục ${+k.slice(1)+1}: ${v}★`).join(' · ')}</div><div>${escapeHTML(x.comment||'Không có góp ý')}</div><div class="meta">${escapeHTML(x.created_at||'')}</div></div>`).join('')||'<p>Chưa có đánh giá.</p>';
+  const pages=p.pages||1;
+  document.getElementById('pager').innerHTML=`<button ${p.page<=1?'disabled':''} onclick="changeAdminPage(${Math.max(1,p.page-1)})">← Trước</button><span>Trang ${p.page||1}/${pages}</span><button ${p.page>=pages?'disabled':''} onclick="changeAdminPage(${Math.min(pages,(p.page||1)+1)})">Sau →</button>`;
+}
+
+async function changeAdminPage(page){
+  try{
+    const j=await fetchAdmin(page);
+    if(!j){alert('Phiên quản trị đã hết hạn.');document.getElementById('admin').style.display='none';return;}
+    adminPage=page;renderAdmin(j);
+  }catch(e){alert(e.message);}
+}
+
+async function admin(){
+  if(new URLSearchParams(location.search).get('admin')!=='1')return;
+  let j=await fetchAdmin(1).catch(()=>null);
+  if(!j){
+    const logged=await loginAdmin();
+    if(!logged)return;
+    j=await fetchAdmin(1).catch(()=>null);
+  }
+  if(!j){alert('Không thể mở trang quản trị.');return;}
+  renderAdmin(j);
+}
+
+document.getElementById('logout').onclick=async()=>{await fetch('/api/admin-logout',{method:'POST',credentials:'same-origin'});document.getElementById('admin').style.display='none';alert('Đã đăng xuất.');};
+loadConfig();
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+admin();
+</script>
+</body>
+</html>

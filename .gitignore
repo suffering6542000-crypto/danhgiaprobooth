@@ -1,0 +1,7 @@
+# Local secrets / environment files
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+.wrangler/
+node_modules/
