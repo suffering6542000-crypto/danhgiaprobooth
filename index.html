@@ -26,7 +26,7 @@
 <section class="grid" id="criteria"></section>
 <section class="overall"><div class="info"><div class="icon">💗</div><div><div class="name">ĐÁNH GIÁ CHUNG</div><div class="desc">Trải nghiệm tổng thể của bạn</div></div></div><div class="rating" data-key="overall"><div class="stars"></div></div></section>
 <section class="comment"><div class="comment-title">✎ &nbsp;GÓP Ý THÊM</div><textarea id="comment" placeholder="Hãy chia sẻ điều bạn thích hoặc điều chúng tôi có thể làm tốt hơn..."></textarea></section>
-<div id="turnstile" style="display:flex;justify-content:center;margin-top:12px"></div><div class="actions"><button class="send" id="send">GỬI ĐÁNH GIÁ</button><button class="reset" id="reset">LÀM LẠI</button></div>
+<div id="turnstile-widget" style="display:flex;justify-content:center;margin-top:12px"></div><div class="actions"><button class="send" id="send">GỬI ĐÁNH GIÁ</button><button class="reset" id="reset">LÀM LẠI</button></div>
 <div class="status" id="status"></div><div class="thanks">♥ &nbsp; Cảm ơn bạn đã dành thời gian! &nbsp; ♥</div>
 <section class="admin" id="admin"><h2>Quản trị đánh giá</h2><div class="stats" id="stats"></div><div id="criteriaStats"></div><div class="pager" id="pager"></div><div id="reviews"></div><button class="reset" id="logout">ĐĂNG XUẤT</button></section>
 </main>
@@ -63,7 +63,7 @@ async function loadConfig(){
       window.TURNSTILE_SITE_KEY=j.turnstileSiteKey;
      if(window.turnstile && typeof window.turnstile.render==='function'){
   window.turnstileWidgetId=window.turnstile.render(
-    '#turnstile',
+    '#turnstile-widget',
     {
       sitekey:window.TURNSTILE_SITE_KEY
     }
